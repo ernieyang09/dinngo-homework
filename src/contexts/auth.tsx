@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { InjectedConnector } from "@web3-react/injected-connector";
-import { useWeb3React } from "@web3-react/core";
+import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import Web3 from "web3";
 import { createContext, useState, useContext, useMemo } from "react";
 import { useSnackbar } from "notistack";
@@ -76,11 +76,13 @@ const AuthContextProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (error) {
-      const message =
-        {
-          UnsupportedChainIdError: "Unsupported Chain",
-        }[error.name] || "Unknown Error";
-      enqueueSnackbar(message, { variant: "error" });
+      let errMsg;
+      if (error instanceof UnsupportedChainIdError) {
+        errMsg = "Unsupported Chain";
+      } else {
+        errMsg = "Unknown Error";
+      }
+      enqueueSnackbar(errMsg, { variant: "error" });
     }
   }, [error]);
 
